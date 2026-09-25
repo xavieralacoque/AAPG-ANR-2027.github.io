@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Architecture cible — 26 briques — Candidature ANR AAPG 2027</title>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --body: #444444;
+    --grey-line: #b0b0b0;
+    --orange-fill: #fff5ed; --orange-border: #fe9f4d; --orange-text: #9b4a08;
+    --blue-fill: #f0f5fd; --blue-border: #659df2; --blue-text: #305bab;
+    --purple-fill: #f4f2fd; --purple-border: #8f7fee; --purple-text: #6631d7;
+    --green-fill: #eaf9ef; --green-border: #2dc75c; --green-text: #067429;
+    --pink-fill: #fdf0fa; --pink-border: #e05fc4; --pink-text: #8f1f78;
+    --yellow-fill: #fffbed; --yellow-border: #ffdc4a; --yellow-text: #af7e04;
+    --cyan-fill: #eafcfb; --cyan-border: #35c2b5; --cyan-text: #0e6b62;
+    --mauve-fill: #faf0fd; --mauve-border: #c07adf; --mauve-text: #6e2f8a;
+    --brown-fill: #fbf3ee; --brown-border: #c98f68; --brown-text: #7a4a26;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #ffffff;
+    color: var(--body);
+  }
+  header {
+    padding: 40px 48px 24px 48px;
+    border-bottom: 1px solid #e7e7e7;
+  }
+  header h1 {
+    margin: 0 0 8px 0;
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  header p {
+    margin: 0;
+    font-size: 15px;
+    color: #595959;
+  }
+  main {
+    padding: 32px 48px 64px 48px;
+    max-width: 1500px;
+    margin: 0 auto;
+  }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 24px;
+    margin-bottom: 36px;
+    font-size: 13px;
+    color: #595959;
+  }
+  .legend span.dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+    align-items: start;
+  }
+  @media (max-width: 1000px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+  .zone {
+    border: 1px solid #e7e7e7;
+    border-radius: 14px;
+    padding: 20px;
+    background: #fff;
+  }
+  .zone h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 0 0 14px 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--zone-border, #e7e7e7);
+  }
+  .brique {
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.4;
+    border: 1.5px solid;
+  }
+  .brique:last-child { margin-bottom: 0; }
+  .brique .num {
+    display: inline-block;
+    font-weight: 700;
+    margin-right: 6px;
+  }
+  .zone-orange h2 { --zone-border: var(--orange-border); }
+  .zone-blue h2 { --zone-border: var(--blue-border); }
+  .zone-purple h2 { --zone-border: var(--purple-border); }
+  .zone-green h2 { --zone-border: var(--green-border); }
+  .zone-pink h2 { --zone-border: var(--pink-border); }
+  .zone-yellow h2 { --zone-border: var(--yellow-border); }
+  .zone-cyan h2 { --zone-border: var(--cyan-border); }
+  .zone-mauve h2 { --zone-border: var(--mauve-border); }
+  .zone-brown h2 { --zone-border: var(--brown-border); }
+
+  .b-orange { background: var(--orange-fill); border-color: var(--orange-border); color: var(--orange-text); }
+  .b-blue { background: var(--blue-fill); border-color: var(--blue-border); color: var(--blue-text); }
+  .b-purple { background: var(--purple-fill); border-color: var(--purple-border); color: var(--purple-text); }
+  .b-green { background: var(--green-fill); border-color: var(--green-border); color: var(--green-text); }
+  .b-pink { background: var(--pink-fill); border-color: var(--pink-border); color: var(--pink-text); }
+  .b-yellow { background: var(--yellow-fill); border-color: var(--yellow-border); color: var(--yellow-text); }
+  .b-cyan { background: var(--cyan-fill); border-color: var(--cyan-border); color: var(--cyan-text); }
+  .b-mauve { background: var(--mauve-fill); border-color: var(--mauve-border); color: var(--mauve-text); }
+  .b-brown { background: var(--brown-fill); border-color: var(--brown-border); color: var(--brown-text); }
+
+  .flow {
+    margin-top: 48px;
+    padding-top: 28px;
+    border-top: 1px solid #e7e7e7;
+  }
+  .flow h2 {
+    font-size: 18px;
+    color: var(--ink);
+    margin: 0 0 16px 0;
+  }
+  .flow ol {
+    padding-left: 20px;
+    font-size: 14px;
+    line-height: 1.8;
+  }
+  footer {
+    padding: 24px 48px 40px 48px;
+    font-size: 12px;
+    color: #999;
+    border-top: 1px solid #e7e7e7;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Architecture cible — les 26 briques techniques</h1>
+  <p>Candidature ANR AAPG 2027 — Oncopole Claudius Regaud / Intellitech / InterSystems — consortium living lab</p>
+</header>
+
+<main>
+
+  <div class="legend">
+    <span><span class="dot" style="background:var(--orange-border)"></span>Couches &amp; interopérabilité</span>
+    <span><span class="dot" style="background:var(--cyan-border)"></span>Sources complémentaires</span>
+    <span><span class="dot" style="background:var(--purple-border)"></span>Traitement IA &amp; sémantique</span>
+    <span><span class="dot" style="background:var(--green-border)"></span>Gouvernance &amp; qualité</span>
+    <span><span class="dot" style="background:var(--pink-border)"></span>Supervision &amp; alerting</span>
+    <span><span class="dot" style="background:var(--yellow-border)"></span>Restitution clinique</span>
+    <span><span class="dot" style="background:var(--blue-border)"></span>Infrastructure &amp; orchestration</span>
+    <span><span class="dot" style="background:var(--mauve-border)"></span>Conformité continue</span>
+    <span><span class="dot" style="background:var(--brown-border)"></span>Impact &amp; valeur</span>
+  </div>
+
+  <div class="grid">
+
+    <div class="zone zone-orange">
+      <h2>Couches &amp; interopérabilité</h2>
+      <div class="brique b-orange"><span class="num">1.</span>Couches médaillon bronze / argent / or</div>
+      <div class="brique b-orange"><span class="num">2.</span>Façade FHIR &amp; modèle pivot OMOP CDM</div>
+    </div>
+
+    <div class="zone zone-cyan">
+      <h2>Sources complémentaires</h2>
+      <div class="brique b-cyan"><span class="num">15.</span>Exposome &amp; objets connectés à domicile</div>
+      <div class="brique b-cyan"><span class="num">16.</span>Séries temporelles haute fréquence (monitorage continu)</div>
+      <div class="brique b-cyan"><span class="num">19.</span>OSINT en complément des capteurs de santé mobile</div>
+    </div>
+
+    <div class="zone zone-purple">
+      <h2>Traitement IA &amp; sémantique</h2>
+      <div class="brique b-purple"><span class="num">11.</span>Traitement texte libre : regex + LLM en cascade</div>
+      <div class="brique b-purple"><span class="num">12.</span>Catalogue de données, graphe de connaissances, ontologie</div>
+      <div class="brique b-purple"><span class="num">17.</span>Modèles explicables non neuronaux (logique floue)</div>
+      <div class="brique b-purple"><span class="num">21.</span>Chaîne RAG pour la donnée non structurée</div>
+    </div>
+
+    <div class="zone zone-green">
+      <h2>Gouvernance &amp; qualité</h2>
+      <div class="brique b-green"><span class="num">3.</span>Gouvernance transverse (identité, sémantique, consentement)</div>
+      <div class="brique b-green"><span class="num">6.</span>Qualité, réconciliation, cycle de vie de la donnée</div>
+      <div class="brique b-green"><span class="num">23.</span>Versionnement systématique (reproductibilité)</div>
+    </div>
+
+    <div class="zone zone-pink">
+      <h2>Supervision &amp; alerting</h2>
+      <div class="brique b-pink"><span class="num">4.</span>Boucle de supervision — retour médecin</div>
+      <div class="brique b-pink"><span class="num">5.</span>Boucle de supervision — détection d'anomalies</div>
+      <div class="brique b-pink"><span class="num">7.</span>Hiérarchisation et routage de l'alerting</div>
+      <div class="brique b-pink"><span class="num">22.</span>Boucle de retour vers le système source</div>
+    </div>
+
+    <div class="zone zone-yellow">
+      <h2>Restitution clinique</h2>
+      <div class="brique b-yellow"><span class="num">18.</span>Frise chronologique patient</div>
+      <div class="brique b-yellow"><span class="num">20.</span>Tableaux de bord à trois échelles</div>
+    </div>
+
+    <div class="zone zone-blue">
+      <h2>Infrastructure &amp; orchestration</h2>
+      <div class="brique b-blue"><span class="num">8.</span>Stack conteneurisée (Docker / Kubernetes)</div>
+      <div class="brique b-blue"><span class="num">9.</span>Chiffrement &amp; gestion fine des accès</div>
+      <div class="brique b-blue"><span class="num">10.</span>Orchestration Airflow &amp; transformation DBT</div>
+      <div class="brique b-blue"><span class="num">13.</span>Tests de bout en bout sur données synthétiques</div>
+      <div class="brique b-blue"><span class="num">14.</span>Scalabilité et dimensionnement</div>
+    </div>
+
+    <div class="zone zone-mauve">
+      <h2>Conformité continue</h2>
+      <div class="brique b-mauve"><span class="num">25.</span>Surface d'exposition &amp; tests d'intrusion</div>
+      <div class="brique b-mauve"><span class="num">26.</span>Conformité réglementaire (HDS, AI Act, RGPD, AIPD)</div>
+    </div>
+
+    <div class="zone zone-brown">
+      <h2>Impact &amp; valeur</h2>
+      <div class="brique b-brown"><span class="num">24.</span>Recherche clinique auto-implantée (mesure d'impact)</div>
+    </div>
+
+  </div>
+
+  <div class="flow">
+    <h2>Logique des flux entre zones</h2>
+    <ol>
+      <li>Les sources complémentaires (exposome, objets connectés, séries temporelles, OSINT) alimentent les couches médaillon en ingestion.</li>
+      <li>Les couches médaillon et la façade FHIR/OMOP CDM transforment la donnée vers les briques de traitement IA et sémantique.</li>
+      <li>Le traitement IA et sémantique restitue vers les tableaux de bord et la frise chronologique patient.</li>
+      <li>La restitution clinique route les alertes vers les boucles de supervision, qui réinjectent leurs validations dans les couches médaillon.</li>
+      <li>La gouvernance et la qualité encadrent en amont l'ensemble des couches médaillon.</li>
+      <li>L'infrastructure et l'orchestration forment le socle technique de la gouvernance et de la qualité.</li>
+      <li>La conformité continue audite en permanence l'infrastructure et l'orchestration.</li>
+      <li>La recherche clinique auto-implantée mesure l'impact produit par la restitution clinique.</li>
+    </ol>
+  </div>
+
+</main>
+
+<footer>
+  Schéma d'architecture complet — candidature ANR AAPG 2027 — document de cadrage interne, Oncopole Claudius Regaud.
+</footer>
+
+</body>
+</html>
