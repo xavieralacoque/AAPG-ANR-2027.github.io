@@ -5,141 +5,88 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Architecture cible — 26 briques — Candidature ANR AAPG 2027</title>
 <style>
-  :root {
-    --ink: #1a1a1a;
-    --body: #444444;
-    --grey-line: #b0b0b0;
-    --orange-fill: #fff5ed; --orange-border: #fe9f4d; --orange-text: #9b4a08;
-    --blue-fill: #f0f5fd; --blue-border: #659df2; --blue-text: #305bab;
-    --purple-fill: #f4f2fd; --purple-border: #8f7fee; --purple-text: #6631d7;
-    --green-fill: #eaf9ef; --green-border: #2dc75c; --green-text: #067429;
-    --pink-fill: #fdf0fa; --pink-border: #e05fc4; --pink-text: #8f1f78;
-    --yellow-fill: #fffbed; --yellow-border: #ffdc4a; --yellow-text: #af7e04;
-    --cyan-fill: #eafcfb; --cyan-border: #35c2b5; --cyan-text: #0e6b62;
-    --mauve-fill: #faf0fd; --mauve-border: #c07adf; --mauve-text: #6e2f8a;
-    --brown-fill: #fbf3ee; --brown-border: #c98f68; --brown-text: #7a4a26;
-  }
   * { box-sizing: border-box; }
-  body {
-    margin: 0;
+  html, body {
+    margin: 0; padding: 0; height: 100%;
     font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background: #ffffff;
-    color: var(--body);
+    background: #ffffff; color: #444;
+    overflow: hidden;
   }
   header {
-    padding: 40px 48px 24px 48px;
+    position: relative;
+    z-index: 5;
+    padding: 20px 28px 14px 28px;
     border-bottom: 1px solid #e7e7e7;
+    background: #ffffff;
   }
-  header h1 {
-    margin: 0 0 8px 0;
-    font-size: 30px;
-    font-weight: 700;
-    color: var(--ink);
+  header h1 { margin: 0 0 4px 0; font-size: 22px; font-weight: 700; color: #1a1a1a; }
+  header p { margin: 0; font-size: 13px; color: #666; }
+  #stage {
+    position: absolute;
+    top: 84px; left: 0; right: 0; bottom: 0;
+    cursor: grab;
   }
-  header p {
-    margin: 0;
-    font-size: 15px;
-    color: #595959;
-  }
-  main {
-    padding: 32px 48px 64px 48px;
-    max-width: 1500px;
-    margin: 0 auto;
-  }
-  .legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px 24px;
-    margin-bottom: 36px;
-    font-size: 13px;
-    color: #595959;
-  }
-  .legend span.dot {
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    margin-right: 6px;
-    vertical-align: middle;
-  }
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 28px;
-    align-items: start;
-  }
-  @media (max-width: 1000px) {
-    .grid { grid-template-columns: 1fr; }
-  }
-  .zone {
-    border: 1px solid #e7e7e7;
-    border-radius: 14px;
-    padding: 20px;
-    background: #fff;
-  }
-  .zone h2 {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--ink);
-    margin: 0 0 14px 0;
-    padding-bottom: 10px;
-    border-bottom: 2px solid var(--zone-border, #e7e7e7);
-  }
-  .brique {
-    border-radius: 10px;
-    padding: 12px 14px;
-    margin-bottom: 10px;
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 1.4;
-    border: 1.5px solid;
-  }
-  .brique:last-child { margin-bottom: 0; }
-  .brique .num {
-    display: inline-block;
-    font-weight: 700;
-    margin-right: 6px;
-  }
-  .zone-orange h2 { --zone-border: var(--orange-border); }
-  .zone-blue h2 { --zone-border: var(--blue-border); }
-  .zone-purple h2 { --zone-border: var(--purple-border); }
-  .zone-green h2 { --zone-border: var(--green-border); }
-  .zone-pink h2 { --zone-border: var(--pink-border); }
-  .zone-yellow h2 { --zone-border: var(--yellow-border); }
-  .zone-cyan h2 { --zone-border: var(--cyan-border); }
-  .zone-mauve h2 { --zone-border: var(--mauve-border); }
-  .zone-brown h2 { --zone-border: var(--brown-border); }
+  #stage.dragging { cursor: grabbing; }
+  svg { width: 100%; height: 100%; display: block; background: #ffffff; }
+  .frame-title { font-size: 26px; font-weight: 700; fill: #333; }
+  .node rect { transition: opacity .2s, stroke-width .2s; cursor: pointer; }
+  .node text { font-size: 22px; font-weight: 600; pointer-events: none; }
+  .node.dimmed rect { opacity: .18; }
+  .node.dimmed text { opacity: .3; }
+  .node.active rect { stroke-width: 6; }
+  .node:hover rect { filter: brightness(0.95); }
+  .edge { transition: opacity .2s, stroke-width .2s; }
+  .edge.dimmed { opacity: .08; }
+  .edge.active { stroke-width: 7 !important; opacity: 1 !important; }
 
-  .b-orange { background: var(--orange-fill); border-color: var(--orange-border); color: var(--orange-text); }
-  .b-blue { background: var(--blue-fill); border-color: var(--blue-border); color: var(--blue-text); }
-  .b-purple { background: var(--purple-fill); border-color: var(--purple-border); color: var(--purple-text); }
-  .b-green { background: var(--green-fill); border-color: var(--green-border); color: var(--green-text); }
-  .b-pink { background: var(--pink-fill); border-color: var(--pink-border); color: var(--pink-text); }
-  .b-yellow { background: var(--yellow-fill); border-color: var(--yellow-border); color: var(--yellow-text); }
-  .b-cyan { background: var(--cyan-fill); border-color: var(--cyan-border); color: var(--cyan-text); }
-  .b-mauve { background: var(--mauve-fill); border-color: var(--mauve-border); color: var(--mauve-text); }
-  .b-brown { background: var(--brown-fill); border-color: var(--brown-border); color: var(--brown-text); }
+  #controls {
+    position: fixed; right: 20px; bottom: 20px; z-index: 10;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  #controls button {
+    width: 42px; height: 42px; border-radius: 10px; border: 1px solid #ddd;
+    background: #fff; font-size: 20px; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,.08);
+  }
+  #controls button:hover { background: #f5f5f5; }
 
-  .flow {
-    margin-top: 48px;
-    padding-top: 28px;
-    border-top: 1px solid #e7e7e7;
+  #legend-toggle {
+    position: fixed; left: 20px; bottom: 20px; z-index: 11;
+    width: 42px; height: 42px; border-radius: 10px; border: 1px solid #ddd;
+    background: #fff; font-size: 18px; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,.08);
   }
-  .flow h2 {
-    font-size: 18px;
-    color: var(--ink);
-    margin: 0 0 16px 0;
+  #legend-toggle:hover { background: #f5f5f5; }
+  #legend {
+    position: fixed; left: 20px; bottom: 72px; z-index: 10;
+    background: #fff; border: 1px solid #e7e7e7; border-radius: 12px;
+    padding: 12px 16px; font-size: 12px; color: #555;
+    box-shadow: 0 2px 6px rgba(0,0,0,.06);
+    max-width: 240px;
+    display: none;
   }
-  .flow ol {
-    padding-left: 20px;
-    font-size: 14px;
-    line-height: 1.8;
+  #legend.show { display: block; }
+  #legend .row { display: flex; align-items: center; gap: 6px; margin: 3px 0; }
+  #legend .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  #legend .line-demo { display:flex; align-items:center; gap:6px; margin-top:8px; padding-top:8px; border-top:1px solid #eee; }
+
+  #panel {
+    position: fixed; top: 100px; right: 20px; z-index: 10;
+    width: 320px; max-height: 70vh; overflow-y: auto;
+    background: #fff; border: 1px solid #e7e7e7; border-radius: 14px;
+    box-shadow: 0 6px 20px rgba(0,0,0,.12);
+    padding: 18px; display: none;
   }
-  footer {
-    padding: 24px 48px 40px 48px;
-    font-size: 12px;
-    color: #999;
-    border-top: 1px solid #e7e7e7;
+  #panel.show { display: block; }
+  #panel h3 { margin: 0 0 6px 0; font-size: 15px; color: #1a1a1a; }
+  #panel .zone-tag { display:inline-block; font-size:11px; padding:2px 8px; border-radius:20px; margin-bottom:10px; }
+  #panel h4 { margin: 14px 0 6px 0; font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: .04em; }
+  #panel ul { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.6; }
+  #panel .close-btn {
+    position: absolute; top: 12px; right: 14px; cursor: pointer; font-size: 18px; color: #999; border:none; background:none;
+  }
+  #hint {
+    position: fixed; top: 96px; left: 50%; transform: translateX(-50%); z-index: 10;
+    background: rgba(0,0,0,.72); color: #fff; font-size: 12px; padding: 7px 14px; border-radius: 20px;
+    pointer-events: none; transition: opacity .4s;
   }
 </style>
 </head>
@@ -147,108 +94,494 @@
 
 <header>
   <h1>Architecture cible — les 26 briques techniques</h1>
-  <p>Candidature ANR AAPG 2027 — Oncopole Claudius Regaud / Intellitech / InterSystems — consortium living lab</p>
+  <p>Candidature ANR AAPG 2027 — Oncopole Claudius Regaud / Intellitech / InterSystems — cliquez une brique pour voir ses connexions, molette pour zoomer, glissez pour naviguer</p>
 </header>
 
-<main>
+<div id="hint">Cliquez sur une brique pour explorer ses connexions</div>
 
-  <div class="legend">
-    <span><span class="dot" style="background:var(--orange-border)"></span>Couches &amp; interopérabilité</span>
-    <span><span class="dot" style="background:var(--cyan-border)"></span>Sources complémentaires</span>
-    <span><span class="dot" style="background:var(--purple-border)"></span>Traitement IA &amp; sémantique</span>
-    <span><span class="dot" style="background:var(--green-border)"></span>Gouvernance &amp; qualité</span>
-    <span><span class="dot" style="background:var(--pink-border)"></span>Supervision &amp; alerting</span>
-    <span><span class="dot" style="background:var(--yellow-border)"></span>Restitution clinique</span>
-    <span><span class="dot" style="background:var(--blue-border)"></span>Infrastructure &amp; orchestration</span>
-    <span><span class="dot" style="background:var(--mauve-border)"></span>Conformité continue</span>
-    <span><span class="dot" style="background:var(--brown-border)"></span>Impact &amp; valeur</span>
-  </div>
+<div id="stage">
+<svg id="svg" viewBox="-150 0 3970 2650">
+  <defs>
+    <marker id="arrow-259D92" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#259D92"/>
+    </marker>
+<marker id="arrow-2C97BB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2C97BB"/>
+    </marker>
+<marker id="arrow-6E9A24" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#6E9A24"/>
+    </marker>
+<marker id="arrow-8A7BE0" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8A7BE0"/>
+    </marker>
+<marker id="arrow-A28E26" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#A28E26"/>
+    </marker>
+<marker id="arrow-AA8570" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#AA8570"/>
+    </marker>
+<marker id="arrow-AC7ABA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#AC7ABA"/>
+    </marker>
+<marker id="arrow-CC7830" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#CC7830"/>
+    </marker>
+<marker id="arrow-D756BA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#D756BA"/>
+    </marker>
+  </defs>
+  <rect id="bg" x="-150" y="0" width="3970" height="2650" fill="#ffffff"/>
+  <g class="frames">
+    <g class="frame">
+      <rect x="0" y="180" width="1050" height="404" rx="20" fill="#fafafa" stroke="#e2e2e2" stroke-width="2"/>
+      <text x="20" y="166" class="frame-title">Sources complémentaires</text>
+    </g>
 
-  <div class="grid">
+    <g class="frame">
+      <rect x="1310" y="180" width="1050" height="284" rx="20" fill="#fafafa" stroke="#e2e2e2" stroke-width="2"/>
+      <text x="1330" y="166" class="frame-title">Couches &amp; interopérabilité</text>
+    </g>
 
-    <div class="zone zone-orange">
-      <h2>Couches &amp; interopérabilité</h2>
-      <div class="brique b-orange"><span class="num">1.</span>Couches médaillon bronze / argent / or</div>
-      <div class="brique b-orange"><span class="num">2.</span>Façade FHIR &amp; modèle pivot OMOP CDM</div>
-    </div>
+    <g class="frame">
+      <rect x="2620" y="180" width="1050" height="524" rx="20" fill="#fafafa" stroke="#e2e2e2" stroke-width="2"/>
+      <text x="2640" y="166" class="frame-title">Traitement IA &amp; sémantique</text>
+    </g>
 
-    <div class="zone zone-cyan">
-      <h2>Sources complémentaires</h2>
-      <div class="brique b-cyan"><span class="num">15.</span>Exposome , open data , objets connectés à domicile</div>
-      <div class="brique b-cyan"><span class="num">16.</span>Séries temporelles haute fréquence (monitorage continu)</div>
-      <div class="brique b-cyan"><span class="num">19.</span>OSINT en complément des capteurs de santé mobile</div>
-    </div>
+    <g class="frame">
+      <rect x="0" y="1024" width="1050" height="404" rx="20" fill="#fafafa" stroke="#e2e2e2" stroke-width="2"/>
+      <text x="20" y="1010" class="frame-title">Gouvernance &amp; qualité</text>
+    </g>
 
-    <div class="zone zone-purple">
-      <h2>Traitement IA &amp; sémantique</h2>
-      <div class="brique b-purple"><span class="num">11.</span>Traitement texte libre : regex + LLM en cascade</div>
-      <div class="brique b-purple"><span class="num">12.</span>Catalogue de données, graphe de connaissances, ontologie</div>
-      <div class="brique b-purple"><span class="num">17.</span>Modèles explicables non neuronaux (logique floue)</div>
-      <div class="brique b-purple"><span class="num">21.</span>Chaîne RAG pour la donnée non structurée</div>
-    </div>
+    <g class="frame">
+      <rect x="1310" y="1024" width="1050" height="524" rx="20" fill="#fafafa" stroke="#e2e2e2" stroke-width="2"/>
+      <text x="1330" y="1010" class="frame-title">Supervision &amp; alerting</text>
+    </g>
 
-    <div class="zone zone-green">
-      <h2>Gouvernance &amp; qualité</h2>
-      <div class="brique b-green"><span class="num">3.</span>Gouvernance transverse (identité, sémantique, consentement)</div>
-      <div class="brique b-green"><span class="num">6.</span>Qualité, réconciliation, cycle de vie de la donnée</div>
-      <div class="brique b-green"><span class="num">23.</span>Versionnement systématique (reproductibilité)</div>
-    </div>
+    <g class="frame">
+      <rect x="2620" y="1024" width="1050" height="284" rx="20" fill="#fafafa" stroke="#e2e2e2" stroke-width="2"/>
+      <text x="2640" y="1010" class="frame-title">Restitution clinique</text>
+    </g>
 
-    <div class="zone zone-pink">
-      <h2>Supervision &amp; alerting</h2>
-      <div class="brique b-pink"><span class="num">4.</span>Boucle de supervision — retour médecin</div>
-      <div class="brique b-pink"><span class="num">5.</span>Boucle de supervision — détection d'anomalies</div>
-      <div class="brique b-pink"><span class="num">7.</span>Hiérarchisation et routage de l'alerting</div>
-      <div class="brique b-pink"><span class="num">22.</span>Boucle de retour vers le système source</div>
-    </div>
+    <g class="frame">
+      <rect x="0" y="1868" width="1050" height="644" rx="20" fill="#fafafa" stroke="#e2e2e2" stroke-width="2"/>
+      <text x="20" y="1854" class="frame-title">Infrastructure &amp; orchestration</text>
+    </g>
 
-    <div class="zone zone-yellow">
-      <h2>Restitution clinique</h2>
-      <div class="brique b-yellow"><span class="num">18.</span>Frise chronologique patient</div>
-      <div class="brique b-yellow"><span class="num">20.</span>Tableaux de bord à trois échelles</div>
-    </div>
+    <g class="frame">
+      <rect x="1310" y="1868" width="1050" height="284" rx="20" fill="#fafafa" stroke="#e2e2e2" stroke-width="2"/>
+      <text x="1330" y="1854" class="frame-title">Conformité continue</text>
+    </g>
 
-    <div class="zone zone-blue">
-      <h2>Infrastructure &amp; orchestration</h2>
-      <div class="brique b-blue"><span class="num">8.</span>Stack conteneurisée (Docker / Kubernetes)</div>
-      <div class="brique b-blue"><span class="num">9.</span>Chiffrement &amp; gestion fine des accès</div>
-      <div class="brique b-blue"><span class="num">10.</span>Orchestration Airflow &amp; transformation DBT</div>
-      <div class="brique b-blue"><span class="num">13.</span>Tests de bout en bout sur données synthétiques</div>
-      <div class="brique b-blue"><span class="num">14.</span>Scalabilité et dimensionnement</div>
-    </div>
+    <g class="frame">
+      <rect x="2620" y="1868" width="1050" height="164" rx="20" fill="#fafafa" stroke="#e2e2e2" stroke-width="2"/>
+      <text x="2640" y="1854" class="frame-title">Impact &amp; valeur</text>
+    </g>
+  </g>
+  <g class="edges">
+    <path id="edge-0" class="edge" data-source="F15" data-target="A1" d="M 1018,262.0 L 1342,262.0" fill="none" stroke="#259D92" stroke-width="4" marker-end="url(#arrow-259D92)"/>
+<path id="edge-1" class="edge" data-source="F16" data-target="A1" d="M 1018,382.0 L 1342,262.0" fill="none" stroke="#259D92" stroke-width="4" marker-end="url(#arrow-259D92)"/>
+<path id="edge-2" class="edge" data-source="F19" data-target="A1" d="M 1018,502.0 L 1342,262.0" fill="none" stroke="#259D92" stroke-width="4" marker-end="url(#arrow-259D92)"/>
+<path id="edge-3" class="edge" data-source="A1" data-target="A2" d="M 1835.0,312 L 1835.0,332" fill="none" stroke="#CC7830" stroke-width="4" marker-end="url(#arrow-CC7830)"/>
+<path id="edge-4" class="edge" data-source="A2" data-target="C11" d="M 2328,382.0 L 2652,262.0" fill="none" stroke="#CC7830" stroke-width="4" marker-end="url(#arrow-CC7830)"/>
+<path id="edge-5" class="edge" data-source="A2" data-target="C12" d="M 2328,382.0 L 2652,382.0" fill="none" stroke="#CC7830" stroke-width="4" marker-end="url(#arrow-CC7830)"/>
+<path id="edge-6" class="edge" data-source="C11" data-target="C12" d="M 3145.0,312 L 3145.0,332" fill="none" stroke="#8A7BE0" stroke-width="4" marker-end="url(#arrow-8A7BE0)"/>
+<path id="edge-7" class="edge" data-source="C12" data-target="C17" d="M 3145.0,432 L 3145.0,452" fill="none" stroke="#8A7BE0" stroke-width="4" marker-end="url(#arrow-8A7BE0)"/>
+<path id="edge-8" class="edge" data-source="C12" data-target="C21" d="M 3638,382.0 L 3700,382.0 L 3700,622.0 L 3638,622.0" fill="none" stroke="#8A7BE0" stroke-width="4" marker-end="url(#arrow-8A7BE0)"/>
+<path id="edge-9" class="edge" data-source="C17" data-target="G18" d="M 3638,502.0 L 3730,502.0 L 3730,1106.0 L 3638,1106.0" fill="none" stroke="#8A7BE0" stroke-width="4" marker-end="url(#arrow-8A7BE0)"/>
+<path id="edge-10" class="edge" data-source="C17" data-target="G20" d="M 3638,502.0 L 3760,502.0 L 3760,1226.0 L 3638,1226.0" fill="none" stroke="#8A7BE0" stroke-width="4" marker-end="url(#arrow-8A7BE0)"/>
+<path id="edge-11" class="edge" data-source="C21" data-target="G18" d="M 3145.0,672 L 3145.0,1056" fill="none" stroke="#8A7BE0" stroke-width="4" marker-end="url(#arrow-8A7BE0)"/>
+<path id="edge-12" class="edge" data-source="G20" data-target="E5" d="M 2652,1226.0 L 2328,1226.0" fill="none" stroke="#A28E26" stroke-width="4" stroke-dasharray="10,8" marker-end="url(#arrow-A28E26)"/>
+<path id="edge-13" class="edge" data-source="G18" data-target="E4" d="M 2652,1106.0 L 2328,1106.0" fill="none" stroke="#A28E26" stroke-width="4" stroke-dasharray="10,8" marker-end="url(#arrow-A28E26)"/>
+<path id="edge-14" class="edge" data-source="E4" data-target="E7" d="M 2328,1106.0 L 2390,1106.0 L 2390,1346.0 L 2328,1346.0" fill="none" stroke="#D756BA" stroke-width="4" stroke-dasharray="10,8" marker-end="url(#arrow-D756BA)"/>
+<path id="edge-15" class="edge" data-source="E5" data-target="E7" d="M 1835.0,1276 L 1835.0,1296" fill="none" stroke="#D756BA" stroke-width="4" stroke-dasharray="10,8" marker-end="url(#arrow-D756BA)"/>
+<path id="edge-16" class="edge" data-source="E7" data-target="E22" d="M 1835.0,1396 L 1835.0,1416" fill="none" stroke="#D756BA" stroke-width="4" stroke-dasharray="10,8" marker-end="url(#arrow-D756BA)"/>
+<path id="edge-17" class="edge" data-source="E22" data-target="A1" d="M 2328,1466.0 L 2420,1466.0 L 2420,262.0 L 2328,262.0" fill="none" stroke="#D756BA" stroke-width="4" stroke-dasharray="10,8" marker-end="url(#arrow-D756BA)"/>
+<path id="edge-18" class="edge" data-source="D3" data-target="A1" d="M 1018,1106.0 L 1342,262.0" fill="none" stroke="#6E9A24" stroke-width="4" stroke-dasharray="10,8" marker-end="url(#arrow-6E9A24)"/>
+<path id="edge-19" class="edge" data-source="D3" data-target="A2" d="M 1018,1106.0 L 1342,382.0" fill="none" stroke="#6E9A24" stroke-width="4" stroke-dasharray="10,8" marker-end="url(#arrow-6E9A24)"/>
+<path id="edge-20" class="edge" data-source="D6" data-target="A1" d="M 1018,1226.0 L 1342,262.0" fill="none" stroke="#6E9A24" stroke-width="4" stroke-dasharray="10,8" marker-end="url(#arrow-6E9A24)"/>
+<path id="edge-21" class="edge" data-source="D23" data-target="B10" d="M 1018,1346.0 L 1270,1346.0 L 1270,2190.0 L 1018,2190.0" fill="none" stroke="#6E9A24" stroke-width="4" stroke-dasharray="10,8" marker-end="url(#arrow-6E9A24)"/>
+<path id="edge-22" class="edge" data-source="B10" data-target="A1" d="M 1018,2190.0 L 1342,262.0" fill="none" stroke="#2C97BB" stroke-width="4" stroke-dasharray="10,8" marker-end="url(#arrow-2C97BB)"/>
+<path id="edge-23" class="edge" data-source="B8" data-target="B10" d="M 1018,1950.0 L 1300,1950.0 L 1300,2190.0 L 1018,2190.0" fill="none" stroke="#2C97BB" stroke-width="4" stroke-dasharray="10,8" marker-end="url(#arrow-2C97BB)"/>
+<path id="edge-24" class="edge" data-source="B9" data-target="B8" d="M 525.0,2020 L 525.0,2000" fill="none" stroke="#2C97BB" stroke-width="4" stroke-dasharray="10,8" marker-end="url(#arrow-2C97BB)"/>
+<path id="edge-25" class="edge" data-source="B13" data-target="B10" d="M 525.0,2260 L 525.0,2240" fill="none" stroke="#2C97BB" stroke-width="4" stroke-dasharray="10,8" marker-end="url(#arrow-2C97BB)"/>
+<path id="edge-26" class="edge" data-source="B14" data-target="B8" d="M 1018,2430.0 L 1330,2430.0 L 1330,1950.0 L 1018,1950.0" fill="none" stroke="#2C97BB" stroke-width="4" stroke-dasharray="10,8" marker-end="url(#arrow-2C97BB)"/>
+<path id="edge-27" class="edge" data-source="H25" data-target="B9" d="M 1342,1950.0 L 1018,2070.0" fill="none" stroke="#AC7ABA" stroke-width="4" stroke-dasharray="10,8" marker-end="url(#arrow-AC7ABA)"/>
+<path id="edge-28" class="edge" data-source="H26" data-target="D3" d="M 1342,2070.0 L 1018,1106.0" fill="none" stroke="#AC7ABA" stroke-width="4" stroke-dasharray="10,8" marker-end="url(#arrow-AC7ABA)"/>
+<path id="edge-29" class="edge" data-source="I24" data-target="G20" d="M 3145.0,1900 L 3145.0,1276" fill="none" stroke="#AA8570" stroke-width="4" stroke-dasharray="10,8" marker-end="url(#arrow-AA8570)"/>
+  </g>
+  <g class="nodes">
+    <g class="node" data-id="F15" data-zone="cyan" data-conn="A1">
+      <rect x="32" y="212" width="986" height="100" rx="14" fill="#81E7DE" stroke="#259D92" stroke-width="3"/>
+      <text x="56" y="262.0" dominant-baseline="middle" fill="#0E4343">15. Exposome &amp; objets connectés à domicile</text>
+      <title>15. Exposome &amp; objets connectés à domicile — Zone : Sources complémentaires</title>
+    </g>
 
-    <div class="zone zone-mauve">
-      <h2>Conformité continue</h2>
-      <div class="brique b-mauve"><span class="num">25.</span>Surface d'exposition &amp; tests d'intrusion</div>
-      <div class="brique b-mauve"><span class="num">26.</span>Conformité réglementaire (HDS, AI Act, RGPD, AIPD)</div>
-    </div>
+    <g class="node" data-id="F16" data-zone="cyan" data-conn="A1">
+      <rect x="32" y="332" width="986" height="100" rx="14" fill="#81E7DE" stroke="#259D92" stroke-width="3"/>
+      <text x="56" y="382.0" dominant-baseline="middle" fill="#0E4343">16. Séries temporelles haute fréquence (monitorage continu)</text>
+      <title>16. Séries temporelles haute fréquence (monitorage continu) — Zone : Sources complémentaires</title>
+    </g>
 
-    <div class="zone zone-brown">
-      <h2>Impact &amp; valeur</h2>
-      <div class="brique b-brown"><span class="num">24.</span>Recherche clinique auto-implantée (mesure d'impact)</div>
-    </div>
+    <g class="node" data-id="F19" data-zone="cyan" data-conn="A1">
+      <rect x="32" y="452" width="986" height="100" rx="14" fill="#81E7DE" stroke="#259D92" stroke-width="3"/>
+      <text x="56" y="502.0" dominant-baseline="middle" fill="#0E4343">19. OSINT en complément des capteurs de santé mobile</text>
+      <title>19. OSINT en complément des capteurs de santé mobile — Zone : Sources complémentaires</title>
+    </g>
 
-  </div>
+    <g class="node" data-id="A1" data-zone="orange" data-conn="A2,B10,D3,D6,E22,F15,F16,F19">
+      <rect x="1342" y="212" width="986" height="100" rx="14" fill="#FFB575" stroke="#CC7830" stroke-width="3"/>
+      <text x="1366" y="262.0" dominant-baseline="middle" fill="#542700">1. Couches médaillon bronze / argent / or</text>
+      <title>1. Couches médaillon bronze / argent / or — Zone : Couches & interopérabilité</title>
+    </g>
 
-  <div class="flow">
-    <h2>Logique des flux entre zones</h2>
-    <ol>
-      <li>Les sources complémentaires (exposome, objets connectés, séries temporelles, OSINT) alimentent les couches médaillon en ingestion.</li>
-      <li>Les couches médaillon et la façade FHIR/OMOP CDM transforment la donnée vers les briques de traitement IA et sémantique.</li>
-      <li>Le traitement IA et sémantique restitue vers les tableaux de bord et la frise chronologique patient.</li>
-      <li>La restitution clinique route les alertes vers les boucles de supervision, qui réinjectent leurs validations dans les couches médaillon.</li>
-      <li>La gouvernance et la qualité encadrent en amont l'ensemble des couches médaillon.</li>
-      <li>L'infrastructure et l'orchestration forment le socle technique de la gouvernance et de la qualité.</li>
-      <li>La conformité continue audite en permanence l'infrastructure et l'orchestration.</li>
-      <li>La recherche clinique auto-implantée mesure l'impact produit par la restitution clinique.</li>
-    </ol>
-  </div>
+    <g class="node" data-id="A2" data-zone="orange" data-conn="A1,C11,C12,D3">
+      <rect x="1342" y="332" width="986" height="100" rx="14" fill="#FFB575" stroke="#CC7830" stroke-width="3"/>
+      <text x="1366" y="382.0" dominant-baseline="middle" fill="#542700">2. Façade FHIR &amp; modèle pivot OMOP CDM</text>
+      <title>2. Façade FHIR &amp; modèle pivot OMOP CDM — Zone : Couches & interopérabilité</title>
+    </g>
 
-</main>
+    <g class="node" data-id="C11" data-zone="purple" data-conn="A2,C12">
+      <rect x="2652" y="212" width="986" height="100" rx="14" fill="#B8ACFB" stroke="#8A7BE0" stroke-width="3"/>
+      <text x="2676" y="262.0" dominant-baseline="middle" fill="#231266">11. Traitement texte libre : regex + LLM en cascade</text>
+      <title>11. Traitement texte libre : regex + LLM en cascade — Zone : Traitement IA & sémantique</title>
+    </g>
 
-<footer>
-  Schéma d'architecture complet — candidature ANR AAPG 2027 — document de cadrage interne, Oncopole Claudius Regaud.
-</footer>
+    <g class="node" data-id="C12" data-zone="purple" data-conn="A2,C11,C17,C21">
+      <rect x="2652" y="332" width="986" height="100" rx="14" fill="#B8ACFB" stroke="#8A7BE0" stroke-width="3"/>
+      <text x="2676" y="382.0" dominant-baseline="middle" fill="#231266">12. Catalogue de données, graphe de connaissances, ontologie</text>
+      <title>12. Catalogue de données, graphe de connaissances, ontologie — Zone : Traitement IA & sémantique</title>
+    </g>
+
+    <g class="node" data-id="C17" data-zone="purple" data-conn="C12,G18,G20">
+      <rect x="2652" y="452" width="986" height="100" rx="14" fill="#B8ACFB" stroke="#8A7BE0" stroke-width="3"/>
+      <text x="2676" y="502.0" dominant-baseline="middle" fill="#231266">17. Modèles explicables non neuronaux (logique floue)</text>
+      <title>17. Modèles explicables non neuronaux (logique floue) — Zone : Traitement IA & sémantique</title>
+    </g>
+
+    <g class="node" data-id="C21" data-zone="purple" data-conn="C12,G18">
+      <rect x="2652" y="572" width="986" height="100" rx="14" fill="#B8ACFB" stroke="#8A7BE0" stroke-width="3"/>
+      <text x="2676" y="622.0" dominant-baseline="middle" fill="#231266">21. Chaîne RAG pour la donnée non structurée</text>
+      <title>21. Chaîne RAG pour la donnée non structurée — Zone : Traitement IA & sémantique</title>
+    </g>
+
+    <g class="node" data-id="D3" data-zone="green" data-conn="A1,A2,H26">
+      <rect x="32" y="1056" width="986" height="100" rx="14" fill="#B3E65F" stroke="#6E9A24" stroke-width="3"/>
+      <text x="56" y="1106.0" dominant-baseline="middle" fill="#2F440B">3. Gouvernance transverse (identité, sémantique, consentement)</text>
+      <title>3. Gouvernance transverse (identité, sémantique, consentement) — Zone : Gouvernance & qualité</title>
+    </g>
+
+    <g class="node" data-id="D6" data-zone="green" data-conn="A1">
+      <rect x="32" y="1176" width="986" height="100" rx="14" fill="#B3E65F" stroke="#6E9A24" stroke-width="3"/>
+      <text x="56" y="1226.0" dominant-baseline="middle" fill="#2F440B">6. Qualité, réconciliation, cycle de vie de la donnée</text>
+      <title>6. Qualité, réconciliation, cycle de vie de la donnée — Zone : Gouvernance & qualité</title>
+    </g>
+
+    <g class="node" data-id="D23" data-zone="green" data-conn="B10">
+      <rect x="32" y="1296" width="986" height="100" rx="14" fill="#B3E65F" stroke="#6E9A24" stroke-width="3"/>
+      <text x="56" y="1346.0" dominant-baseline="middle" fill="#2F440B">23. Versionnement systématique (reproductibilité)</text>
+      <title>23. Versionnement systématique (reproductibilité) — Zone : Gouvernance & qualité</title>
+    </g>
+
+    <g class="node" data-id="E4" data-zone="pink" data-conn="E7,G18">
+      <rect x="1342" y="1056" width="986" height="100" rx="14" fill="#FD9AE7" stroke="#D756BA" stroke-width="3"/>
+      <text x="1366" y="1106.0" dominant-baseline="middle" fill="#511341">4. Boucle de supervision — retour médecin</text>
+      <title>4. Boucle de supervision — retour médecin — Zone : Supervision & alerting</title>
+    </g>
+
+    <g class="node" data-id="E5" data-zone="pink" data-conn="E7,G20">
+      <rect x="1342" y="1176" width="986" height="100" rx="14" fill="#FD9AE7" stroke="#D756BA" stroke-width="3"/>
+      <text x="1366" y="1226.0" dominant-baseline="middle" fill="#511341">5. Boucle de supervision — détection d'anomalies</text>
+      <title>5. Boucle de supervision — détection d'anomalies — Zone : Supervision & alerting</title>
+    </g>
+
+    <g class="node" data-id="E7" data-zone="pink" data-conn="E22,E4,E5">
+      <rect x="1342" y="1296" width="986" height="100" rx="14" fill="#FD9AE7" stroke="#D756BA" stroke-width="3"/>
+      <text x="1366" y="1346.0" dominant-baseline="middle" fill="#511341">7. Hiérarchisation et routage de l'alerting</text>
+      <title>7. Hiérarchisation et routage de l'alerting — Zone : Supervision & alerting</title>
+    </g>
+
+    <g class="node" data-id="E22" data-zone="pink" data-conn="A1,E7">
+      <rect x="1342" y="1416" width="986" height="100" rx="14" fill="#FD9AE7" stroke="#D756BA" stroke-width="3"/>
+      <text x="1366" y="1466.0" dominant-baseline="middle" fill="#511341">22. Boucle de retour vers le système source</text>
+      <title>22. Boucle de retour vers le système source — Zone : Supervision & alerting</title>
+    </g>
+
+    <g class="node" data-id="G18" data-zone="yellow" data-conn="C17,C21,E4">
+      <rect x="2652" y="1056" width="986" height="100" rx="14" fill="#FFE86D" stroke="#A28E26" stroke-width="3"/>
+      <text x="2676" y="1106.0" dominant-baseline="middle" fill="#574900">18. Frise chronologique patient</text>
+      <title>18. Frise chronologique patient — Zone : Restitution clinique</title>
+    </g>
+
+    <g class="node" data-id="G20" data-zone="yellow" data-conn="C17,E5,I24">
+      <rect x="2652" y="1176" width="986" height="100" rx="14" fill="#FFE86D" stroke="#A28E26" stroke-width="3"/>
+      <text x="2676" y="1226.0" dominant-baseline="middle" fill="#574900">20. Tableaux de bord à trois échelles</text>
+      <title>20. Tableaux de bord à trois échelles — Zone : Restitution clinique</title>
+    </g>
+
+    <g class="node" data-id="B8" data-zone="blue" data-conn="B10,B14,B9">
+      <rect x="32" y="1900" width="986" height="100" rx="14" fill="#9CE6FF" stroke="#2C97BB" stroke-width="3"/>
+      <text x="56" y="1950.0" dominant-baseline="middle" fill="#1C4657">8. Stack conteneurisée (Docker / Kubernetes)</text>
+      <title>8. Stack conteneurisée (Docker / Kubernetes) — Zone : Infrastructure & orchestration</title>
+    </g>
+
+    <g class="node" data-id="B9" data-zone="blue" data-conn="B8,H25">
+      <rect x="32" y="2020" width="986" height="100" rx="14" fill="#9CE6FF" stroke="#2C97BB" stroke-width="3"/>
+      <text x="56" y="2070.0" dominant-baseline="middle" fill="#1C4657">9. Chiffrement &amp; gestion fine des accès</text>
+      <title>9. Chiffrement &amp; gestion fine des accès — Zone : Infrastructure & orchestration</title>
+    </g>
+
+    <g class="node" data-id="B10" data-zone="blue" data-conn="A1,B13,B8,D23">
+      <rect x="32" y="2140" width="986" height="100" rx="14" fill="#9CE6FF" stroke="#2C97BB" stroke-width="3"/>
+      <text x="56" y="2190.0" dominant-baseline="middle" fill="#1C4657">10. Orchestration Airflow &amp; transformation DBT</text>
+      <title>10. Orchestration Airflow &amp; transformation DBT — Zone : Infrastructure & orchestration</title>
+    </g>
+
+    <g class="node" data-id="B13" data-zone="blue" data-conn="B10">
+      <rect x="32" y="2260" width="986" height="100" rx="14" fill="#9CE6FF" stroke="#2C97BB" stroke-width="3"/>
+      <text x="56" y="2310.0" dominant-baseline="middle" fill="#1C4657">13. Tests de bout en bout sur données synthétiques</text>
+      <title>13. Tests de bout en bout sur données synthétiques — Zone : Infrastructure & orchestration</title>
+    </g>
+
+    <g class="node" data-id="B14" data-zone="blue" data-conn="B8">
+      <rect x="32" y="2380" width="986" height="100" rx="14" fill="#9CE6FF" stroke="#2C97BB" stroke-width="3"/>
+      <text x="56" y="2430.0" dominant-baseline="middle" fill="#1C4657">14. Scalabilité et dimensionnement</text>
+      <title>14. Scalabilité et dimensionnement — Zone : Infrastructure & orchestration</title>
+    </g>
+
+    <g class="node" data-id="H25" data-zone="mauve" data-conn="B9">
+      <rect x="1342" y="1900" width="986" height="100" rx="14" fill="#EEAFFF" stroke="#AC7ABA" stroke-width="3"/>
+      <text x="1366" y="1950.0" dominant-baseline="middle" fill="#531A61">25. Surface d'exposition &amp; tests d'intrusion</text>
+      <title>25. Surface d'exposition &amp; tests d'intrusion — Zone : Conformité continue</title>
+    </g>
+
+    <g class="node" data-id="H26" data-zone="mauve" data-conn="D3">
+      <rect x="1342" y="2020" width="986" height="100" rx="14" fill="#EEAFFF" stroke="#AC7ABA" stroke-width="3"/>
+      <text x="1366" y="2070.0" dominant-baseline="middle" fill="#531A61">26. Conformité réglementaire (HDS, AI Act, RGPD, AIPD)</text>
+      <title>26. Conformité réglementaire (HDS, AI Act, RGPD, AIPD) — Zone : Conformité continue</title>
+    </g>
+
+    <g class="node" data-id="I24" data-zone="brown" data-conn="G20">
+      <rect x="2652" y="1900" width="986" height="100" rx="14" fill="#E1B299" stroke="#AA8570" stroke-width="3"/>
+      <text x="2676" y="1950.0" dominant-baseline="middle" fill="#48230D">24. Recherche clinique auto-implantée (mesure d'impact)</text>
+      <title>24. Recherche clinique auto-implantée (mesure d'impact) — Zone : Impact & valeur</title>
+    </g>
+  </g>
+</svg>
+</div>
+
+<button id="legend-toggle" title="Légende">🎨</button>
+<div id="legend">
+  <div class="row"><span class="dot" style="background:#81E7DE"></span>Sources complémentaires</div>
+  <div class="row"><span class="dot" style="background:#FFB575"></span>Couches &amp; interopérabilité</div>
+  <div class="row"><span class="dot" style="background:#B8ACFB"></span>Traitement IA &amp; sémantique</div>
+  <div class="row"><span class="dot" style="background:#B3E65F"></span>Gouvernance &amp; qualité</div>
+  <div class="row"><span class="dot" style="background:#FD9AE7"></span>Supervision &amp; alerting</div>
+  <div class="row"><span class="dot" style="background:#FFE86D"></span>Restitution clinique</div>
+  <div class="row"><span class="dot" style="background:#9CE6FF"></span>Infrastructure &amp; orchestration</div>
+  <div class="row"><span class="dot" style="background:#EEAFFF"></span>Conformité continue</div>
+  <div class="row"><span class="dot" style="background:#E1B299"></span>Impact &amp; valeur</div>
+  <div class="line-demo">— trait plein : flux principal &nbsp;·&nbsp; ⋯ pointillé : rétroaction</div>
+</div>
+
+<div id="controls">
+  <button id="zoom-in" title="Zoomer">+</button>
+  <button id="zoom-out" title="Dézoomer">−</button>
+  <button id="zoom-reset" title="Réinitialiser la vue">⤢</button>
+</div>
+
+<div id="panel">
+  <button class="close-btn" id="panel-close">×</button>
+  <h3 id="panel-title"></h3>
+  <span class="zone-tag" id="panel-zone"></span>
+  <h4>Briques connectées</h4>
+  <ul id="panel-list"></ul>
+</div>
+
+<script>
+const NODES = {"F15": {"label": "15. Exposome & objets connectés à domicile", "zone": "cyan", "zoneName": "Sources complémentaires"}, "F16": {"label": "16. Séries temporelles haute fréquence (monitorage continu)", "zone": "cyan", "zoneName": "Sources complémentaires"}, "F19": {"label": "19. OSINT en complément des capteurs de santé mobile", "zone": "cyan", "zoneName": "Sources complémentaires"}, "A1": {"label": "1. Couches médaillon bronze / argent / or", "zone": "orange", "zoneName": "Couches & interopérabilité"}, "A2": {"label": "2. Façade FHIR & modèle pivot OMOP CDM", "zone": "orange", "zoneName": "Couches & interopérabilité"}, "C11": {"label": "11. Traitement texte libre : regex + LLM en cascade", "zone": "purple", "zoneName": "Traitement IA & sémantique"}, "C12": {"label": "12. Catalogue de données, graphe de connaissances, ontologie", "zone": "purple", "zoneName": "Traitement IA & sémantique"}, "C17": {"label": "17. Modèles explicables non neuronaux (logique floue)", "zone": "purple", "zoneName": "Traitement IA & sémantique"}, "C21": {"label": "21. Chaîne RAG pour la donnée non structurée", "zone": "purple", "zoneName": "Traitement IA & sémantique"}, "D3": {"label": "3. Gouvernance transverse (identité, sémantique, consentement)", "zone": "green", "zoneName": "Gouvernance & qualité"}, "D6": {"label": "6. Qualité, réconciliation, cycle de vie de la donnée", "zone": "green", "zoneName": "Gouvernance & qualité"}, "D23": {"label": "23. Versionnement systématique (reproductibilité)", "zone": "green", "zoneName": "Gouvernance & qualité"}, "E4": {"label": "4. Boucle de supervision — retour médecin", "zone": "pink", "zoneName": "Supervision & alerting"}, "E5": {"label": "5. Boucle de supervision — détection d'anomalies", "zone": "pink", "zoneName": "Supervision & alerting"}, "E7": {"label": "7. Hiérarchisation et routage de l'alerting", "zone": "pink", "zoneName": "Supervision & alerting"}, "E22": {"label": "22. Boucle de retour vers le système source", "zone": "pink", "zoneName": "Supervision & alerting"}, "G18": {"label": "18. Frise chronologique patient", "zone": "yellow", "zoneName": "Restitution clinique"}, "G20": {"label": "20. Tableaux de bord à trois échelles", "zone": "yellow", "zoneName": "Restitution clinique"}, "B8": {"label": "8. Stack conteneurisée (Docker / Kubernetes)", "zone": "blue", "zoneName": "Infrastructure & orchestration"}, "B9": {"label": "9. Chiffrement & gestion fine des accès", "zone": "blue", "zoneName": "Infrastructure & orchestration"}, "B10": {"label": "10. Orchestration Airflow & transformation DBT", "zone": "blue", "zoneName": "Infrastructure & orchestration"}, "B13": {"label": "13. Tests de bout en bout sur données synthétiques", "zone": "blue", "zoneName": "Infrastructure & orchestration"}, "B14": {"label": "14. Scalabilité et dimensionnement", "zone": "blue", "zoneName": "Infrastructure & orchestration"}, "H25": {"label": "25. Surface d'exposition & tests d'intrusion", "zone": "mauve", "zoneName": "Conformité continue"}, "H26": {"label": "26. Conformité réglementaire (HDS, AI Act, RGPD, AIPD)", "zone": "mauve", "zoneName": "Conformité continue"}, "I24": {"label": "24. Recherche clinique auto-implantée (mesure d'impact)", "zone": "brown", "zoneName": "Impact & valeur"}};
+const ZONE_COLORS = {
+  cyan:   {fill:"#81E7DE",stroke:"#259D92",text:"#0E4343"},
+  orange: {fill:"#FFB575",stroke:"#CC7830",text:"#542700"},
+  purple: {fill:"#B8ACFB",stroke:"#8A7BE0",text:"#231266"},
+  green:  {fill:"#B3E65F",stroke:"#6E9A24",text:"#2F440B"},
+  pink:   {fill:"#FD9AE7",stroke:"#D756BA",text:"#511341"},
+  yellow: {fill:"#FFE86D",stroke:"#A28E26",text:"#574900"},
+  blue:   {fill:"#9CE6FF",stroke:"#2C97BB",text:"#1C4657"},
+  mauve:  {fill:"#EEAFFF",stroke:"#AC7ABA",text:"#531A61"},
+  brown:  {fill:"#E1B299",stroke:"#AA8570",text:"#48230D"}
+};
+
+const svg = document.getElementById('svg');
+const stage = document.getElementById('stage');
+const hint = document.getElementById('hint');
+
+// ---- pan & zoom via viewBox manipulation ----
+let vb = {x:-150, y:0, w:3970, h:2650};
+const initialVb = {...vb};
+
+function applyVB() {
+  svg.setAttribute('viewBox', `${vb.x} ${vb.y} ${vb.w} ${vb.h}`);
+}
+
+function clientToSVG(clientX, clientY) {
+  const rect = stage.getBoundingClientRect();
+  const sx = vb.x + (clientX - rect.left) / rect.width * vb.w;
+  const sy = vb.y + (clientY - rect.top) / rect.height * vb.h;
+  return [sx, sy];
+}
+
+function zoomAt(clientX, clientY, factor) {
+  const [sx, sy] = clientToSVG(clientX, clientY);
+  let newW = vb.w * factor;
+  let newH = vb.h * factor;
+  const minW = 400, maxW = 9000;
+  if (newW < minW) { newW = minW; newH = vb.h * (minW/vb.w); }
+  if (newW > maxW) { newW = maxW; newH = vb.h * (maxW/vb.w); }
+  const ratioX = (sx - vb.x) / vb.w;
+  const ratioY = (sy - vb.y) / vb.h;
+  vb.x = sx - ratioX * newW;
+  vb.y = sy - ratioY * newH;
+  vb.w = newW;
+  vb.h = newH;
+  applyVB();
+}
+
+stage.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const factor = e.deltaY > 0 ? 1.12 : 1/1.12;
+  zoomAt(e.clientX, e.clientY, factor);
+}, {passive:false});
+
+let dragging = false, lastX = 0, lastY = 0, moved = false;
+stage.addEventListener('mousedown', (e) => {
+  dragging = true; moved = false; lastX = e.clientX; lastY = e.clientY;
+  stage.classList.add('dragging');
+});
+window.addEventListener('mousemove', (e) => {
+  if (!dragging) return;
+  const dx = e.clientX - lastX, dy = e.clientY - lastY;
+  if (Math.abs(dx) > 2 || Math.abs(dy) > 2) moved = true;
+  const rect = stage.getBoundingClientRect();
+  vb.x -= dx / rect.width * vb.w;
+  vb.y -= dy / rect.height * vb.h;
+  lastX = e.clientX; lastY = e.clientY;
+  applyVB();
+});
+window.addEventListener('mouseup', () => { dragging = false; stage.classList.remove('dragging'); });
+
+document.getElementById('zoom-in').onclick = () => {
+  const rect = stage.getBoundingClientRect();
+  zoomAt(rect.left + rect.width/2, rect.top + rect.height/2, 1/1.3);
+};
+document.getElementById('zoom-out').onclick = () => {
+  const rect = stage.getBoundingClientRect();
+  zoomAt(rect.left + rect.width/2, rect.top + rect.height/2, 1.3);
+};
+document.getElementById('zoom-reset').onclick = () => {
+  vb = {...initialVb};
+  applyVB();
+};
+
+// touch support (pinch + pan)
+let touchState = null;
+stage.addEventListener('touchstart', (e) => {
+  if (e.touches.length === 1) {
+    dragging = true; moved = false;
+    lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
+  } else if (e.touches.length === 2) {
+    dragging = false;
+    const dx = e.touches[0].clientX - e.touches[1].clientX;
+    const dy = e.touches[0].clientY - e.touches[1].clientY;
+    touchState = { dist: Math.hypot(dx,dy), vb: {...vb} };
+  }
+}, {passive:true});
+stage.addEventListener('touchmove', (e) => {
+  if (e.touches.length === 1 && dragging) {
+    const dx = e.touches[0].clientX - lastX, dy = e.touches[0].clientY - lastY;
+    if (Math.abs(dx) > 2 || Math.abs(dy) > 2) moved = true;
+    const rect = stage.getBoundingClientRect();
+    vb.x -= dx / rect.width * vb.w;
+    vb.y -= dy / rect.height * vb.h;
+    lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
+    applyVB();
+  } else if (e.touches.length === 2 && touchState) {
+    const dx = e.touches[0].clientX - e.touches[1].clientX;
+    const dy = e.touches[0].clientY - e.touches[1].clientY;
+    const dist = Math.hypot(dx,dy);
+    const factor = touchState.dist / dist;
+    const cx = (e.touches[0].clientX + e.touches[1].clientX)/2;
+    const cy = (e.touches[0].clientY + e.touches[1].clientY)/2;
+    vb = {...touchState.vb};
+    zoomAt(cx, cy, factor);
+  }
+}, {passive:true});
+stage.addEventListener('touchend', () => { dragging = false; touchState = null; });
+
+// ---- click to highlight ----
+const panel = document.getElementById('panel');
+const panelTitle = document.getElementById('panel-title');
+const panelZone = document.getElementById('panel-zone');
+const panelList = document.getElementById('panel-list');
+
+function clearSelection() {
+  document.querySelectorAll('.node').forEach(n => n.classList.remove('dimmed','active'));
+  document.querySelectorAll('.edge').forEach(e => e.classList.remove('dimmed','active'));
+  panel.classList.remove('show');
+}
+
+function selectNode(id) {
+  const info = NODES[id];
+  if (!info) return;
+  const connIds = (document.querySelector(`.node[data-id="${id}"]`).dataset.conn || '').split(',').filter(Boolean);
+  const related = new Set([id, ...connIds]);
+
+  document.querySelectorAll('.node').forEach(n => {
+    if (related.has(n.dataset.id)) { n.classList.remove('dimmed'); } else { n.classList.add('dimmed'); }
+    n.classList.toggle('active', n.dataset.id === id);
+  });
+  document.querySelectorAll('.edge').forEach(e => {
+    const isRelated = e.dataset.source === id || e.dataset.target === id;
+    e.classList.toggle('dimmed', !isRelated);
+    e.classList.toggle('active', isRelated);
+  });
+
+  panelTitle.textContent = info.label;
+  const zc = ZONE_COLORS[info.zone];
+  panelZone.textContent = info.zoneName;
+  panelZone.style.background = zc.fill;
+  panelZone.style.color = zc.text;
+  panelZone.style.border = `1px solid ${zc.stroke}`;
+
+  panelList.innerHTML = '';
+  connIds.forEach(cid => {
+    const cinfo = NODES[cid];
+    if (!cinfo) return;
+    const li = document.createElement('li');
+    li.textContent = cinfo.label;
+    li.style.cursor = 'pointer';
+    li.onclick = () => selectNode(cid);
+    panelList.appendChild(li);
+  });
+  panel.classList.add('show');
+}
+
+document.querySelectorAll('.node').forEach(n => {
+  n.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (moved) return;
+    selectNode(n.dataset.id);
+  });
+});
+document.getElementById('bg').addEventListener('click', clearSelection);
+document.getElementById('panel-close').addEventListener('click', clearSelection);
+
+document.getElementById('legend-toggle').addEventListener('click', () => {
+  document.getElementById('legend').classList.toggle('show');
+});
+
+// fade the hint after a few seconds
+setTimeout(() => { hint.style.opacity = '0'; }, 4500);
+</script>
 
 </body>
 </html>
