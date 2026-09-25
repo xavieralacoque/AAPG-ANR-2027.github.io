@@ -7,10 +7,9 @@
 <style>
   * { box-sizing: border-box; }
   html, body {
-    margin: 0; padding: 0; height: 100%;
+    margin: 0; padding: 0;
     font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background: #ffffff; color: #444;
-    overflow: hidden;
   }
   header {
     position: relative;
@@ -21,9 +20,17 @@
   }
   header h1 { margin: 0 0 4px 0; font-size: 22px; font-weight: 700; color: #1a1a1a; }
   header p { margin: 0; font-size: 13px; color: #666; }
+  #diagram-wrapper {
+    position: relative;
+    width: 100%;
+    height: 88vh;
+    min-height: 480px;
+    overflow: hidden;
+    border-bottom: 1px solid #e7e7e7;
+  }
   #stage {
     position: absolute;
-    top: 84px; left: 0; right: 0; bottom: 0;
+    top: 0; left: 0; right: 0; bottom: 0;
     cursor: grab;
   }
   #stage.dragging { cursor: grabbing; }
@@ -40,7 +47,7 @@
   .edge.active { stroke-width: 7 !important; opacity: 1 !important; }
 
   #controls {
-    position: fixed; right: 20px; bottom: 20px; z-index: 10;
+    position: absolute; right: 20px; bottom: 20px; z-index: 10;
     display: flex; flex-direction: column; gap: 8px;
   }
   #controls button {
@@ -50,13 +57,13 @@
   #controls button:hover { background: #f5f5f5; }
 
   #legend-toggle {
-    position: fixed; left: 20px; bottom: 20px; z-index: 11;
+    position: absolute; left: 20px; bottom: 20px; z-index: 11;
     width: 42px; height: 42px; border-radius: 10px; border: 1px solid #ddd;
     background: #fff; font-size: 18px; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,.08);
   }
   #legend-toggle:hover { background: #f5f5f5; }
   #legend {
-    position: fixed; left: 20px; bottom: 72px; z-index: 10;
+    position: absolute; left: 20px; bottom: 72px; z-index: 10;
     background: #fff; border: 1px solid #e7e7e7; border-radius: 12px;
     padding: 12px 16px; font-size: 12px; color: #555;
     box-shadow: 0 2px 6px rgba(0,0,0,.06);
@@ -69,7 +76,7 @@
   #legend .line-demo { display:flex; align-items:center; gap:6px; margin-top:8px; padding-top:8px; border-top:1px solid #eee; }
 
   #panel {
-    position: fixed; top: 100px; right: 20px; z-index: 10;
+    position: absolute; top: 20px; right: 20px; z-index: 10;
     width: 320px; max-height: 70vh; overflow-y: auto;
     background: #fff; border: 1px solid #e7e7e7; border-radius: 14px;
     box-shadow: 0 6px 20px rgba(0,0,0,.12);
@@ -84,9 +91,34 @@
     position: absolute; top: 12px; right: 14px; cursor: pointer; font-size: 18px; color: #999; border:none; background:none;
   }
   #hint {
-    position: fixed; top: 96px; left: 50%; transform: translateX(-50%); z-index: 10;
+    position: absolute; top: 16px; left: 50%; transform: translateX(-50%); z-index: 10;
     background: rgba(0,0,0,.72); color: #fff; font-size: 12px; padding: 7px 14px; border-radius: 20px;
     pointer-events: none; transition: opacity .4s;
+  }
+
+  #static-content {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 48px 28px 64px 28px;
+  }
+  #static-content h2 {
+    font-size: 22px; color: #1a1a1a; margin: 0 0 20px 0;
+  }
+  #static-content h3.zone-h {
+    font-size: 16px; font-weight: 700; margin: 34px 0 12px 0;
+    padding-bottom: 8px; border-bottom: 2px solid var(--zb, #e7e7e7);
+  }
+  .zone-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 4px; }
+  .zone-table td { padding: 8px 10px; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
+  .zone-table td.num { width: 42px; font-weight: 700; color: var(--zt, #333); }
+  .flow-block {
+    margin-top: 44px; padding-top: 28px; border-top: 1px solid #e7e7e7;
+  }
+  .flow-block ol { padding-left: 20px; font-size: 14px; line-height: 1.9; }
+  .flow-block li strong { color: #1a1a1a; }
+  #static-content footer {
+    margin-top: 40px; padding-top: 18px; border-top: 1px solid #e7e7e7;
+    font-size: 12px; color: #999; font-style: italic;
   }
 </style>
 </head>
@@ -97,6 +129,7 @@
   <p>Candidature ANR AAPG 2027 — Oncopole Claudius Regaud / Intellitech / InterSystems — cliquez une brique pour voir ses connexions, molette pour zoomer, glissez pour naviguer</p>
 </header>
 
+<div id="diagram-wrapper">
 <div id="hint">Cliquez sur une brique pour explorer ses connexions</div>
 
 <div id="stage">
@@ -396,6 +429,94 @@
   <h4>Briques connectées</h4>
   <ul id="panel-list"></ul>
 </div>
+
+</div>
+
+<section id="static-content">
+
+  <h2>Détail des 26 briques par zone</h2>
+
+  <h3 class="zone-h" style="--zb:#CC7830">🟧 Couches &amp; interopérabilité</h3>
+  <table class="zone-table" style="--zt:#CC7830">
+    <tr><td class="num">1</td><td>Couches médaillon bronze / argent / or</td></tr>
+    <tr><td class="num">2</td><td>Façade FHIR &amp; modèle pivot OMOP CDM</td></tr>
+  </table>
+
+  <h3 class="zone-h" style="--zb:#259D92">🔷 Sources complémentaires</h3>
+  <table class="zone-table" style="--zt:#259D92">
+    <tr><td class="num">15</td><td>Exposome &amp; objets connectés à domicile</td></tr>
+    <tr><td class="num">16</td><td>Séries temporelles haute fréquence (monitorage continu)</td></tr>
+    <tr><td class="num">19</td><td>OSINT en complément des capteurs de santé mobile</td></tr>
+  </table>
+
+  <h3 class="zone-h" style="--zb:#8A7BE0">🟪 Traitement IA &amp; sémantique</h3>
+  <table class="zone-table" style="--zt:#8A7BE0">
+    <tr><td class="num">11</td><td>Traitement texte libre : regex + LLM en cascade</td></tr>
+    <tr><td class="num">12</td><td>Catalogue de données, graphe de connaissances, ontologie</td></tr>
+    <tr><td class="num">17</td><td>Modèles explicables non neuronaux (logique floue)</td></tr>
+    <tr><td class="num">21</td><td>Chaîne RAG pour la donnée non structurée</td></tr>
+  </table>
+
+  <h3 class="zone-h" style="--zb:#6E9A24">🟩 Gouvernance &amp; qualité</h3>
+  <table class="zone-table" style="--zt:#6E9A24">
+    <tr><td class="num">3</td><td>Gouvernance transverse (identité, sémantique, consentement)</td></tr>
+    <tr><td class="num">6</td><td>Qualité, réconciliation, cycle de vie de la donnée</td></tr>
+    <tr><td class="num">23</td><td>Versionnement systématique (reproductibilité)</td></tr>
+  </table>
+
+  <h3 class="zone-h" style="--zb:#D756BA">🟥 Supervision &amp; alerting</h3>
+  <table class="zone-table" style="--zt:#D756BA">
+    <tr><td class="num">4</td><td>Boucle de supervision — retour médecin</td></tr>
+    <tr><td class="num">5</td><td>Boucle de supervision — détection d'anomalies</td></tr>
+    <tr><td class="num">7</td><td>Hiérarchisation et routage de l'alerting</td></tr>
+    <tr><td class="num">22</td><td>Boucle de retour vers le système source</td></tr>
+  </table>
+
+  <h3 class="zone-h" style="--zb:#A28E26">🟨 Restitution clinique</h3>
+  <table class="zone-table" style="--zt:#A28E26">
+    <tr><td class="num">18</td><td>Frise chronologique patient</td></tr>
+    <tr><td class="num">20</td><td>Tableaux de bord à trois échelles</td></tr>
+  </table>
+
+  <h3 class="zone-h" style="--zb:#2C97BB">🟦 Infrastructure &amp; orchestration</h3>
+  <table class="zone-table" style="--zt:#2C97BB">
+    <tr><td class="num">8</td><td>Stack conteneurisée (Docker / Kubernetes)</td></tr>
+    <tr><td class="num">9</td><td>Chiffrement &amp; gestion fine des accès</td></tr>
+    <tr><td class="num">10</td><td>Orchestration Airflow &amp; transformation DBT</td></tr>
+    <tr><td class="num">13</td><td>Tests de bout en bout sur données synthétiques</td></tr>
+    <tr><td class="num">14</td><td>Scalabilité et dimensionnement</td></tr>
+  </table>
+
+  <h3 class="zone-h" style="--zb:#AC7ABA">🟪 Conformité continue</h3>
+  <table class="zone-table" style="--zt:#AC7ABA">
+    <tr><td class="num">25</td><td>Surface d'exposition &amp; tests d'intrusion</td></tr>
+    <tr><td class="num">26</td><td>Conformité réglementaire (HDS, AI Act, RGPD, AIPD)</td></tr>
+  </table>
+
+  <h3 class="zone-h" style="--zb:#AA8570">🟫 Impact &amp; valeur</h3>
+  <table class="zone-table" style="--zt:#AA8570">
+    <tr><td class="num">24</td><td>Recherche clinique auto-implantée (mesure d'impact)</td></tr>
+  </table>
+
+  <div class="flow-block">
+    <h2>Logique des flux entre zones</h2>
+    <ol>
+      <li><strong>Les sources complémentaires</strong> (exposome, objets connectés, séries temporelles, OSINT) alimentent les <strong>couches médaillon</strong> en ingestion.</li>
+      <li><strong>Les couches médaillon</strong> et la façade FHIR/OMOP CDM transforment la donnée vers le <strong>traitement IA et sémantique</strong>.</li>
+      <li>Le <strong>traitement IA et sémantique</strong> restitue vers la <strong>restitution clinique</strong> (tableaux de bord, frise chronologique).</li>
+      <li>La <strong>restitution clinique</strong> route les alertes vers les <strong>boucles de supervision</strong>, qui réinjectent leurs validations dans les <strong>couches médaillon</strong>.</li>
+      <li>La <strong>gouvernance et la qualité</strong> encadrent en amont l'ensemble des couches médaillon.</li>
+      <li>L'<strong>infrastructure et l'orchestration</strong> forment le socle technique de la gouvernance et de la qualité.</li>
+      <li>La <strong>conformité continue</strong> audite en permanence l'infrastructure et l'orchestration.</li>
+      <li>La <strong>recherche clinique auto-implantée</strong> mesure l'impact produit par la restitution clinique.</li>
+    </ol>
+  </div>
+
+  <footer>
+    Schéma d'architecture complet — candidature ANR AAPG 2027 — document de cadrage interne, Oncopole Claudius Regaud.
+  </footer>
+
+</section>
 
 <script>
 const NODES = {"F15": {"label": "15. Exposome & objets connectés à domicile", "zone": "cyan", "zoneName": "Sources complémentaires"}, "F16": {"label": "16. Séries temporelles haute fréquence (monitorage continu)", "zone": "cyan", "zoneName": "Sources complémentaires"}, "F19": {"label": "19. OSINT en complément des capteurs de santé mobile", "zone": "cyan", "zoneName": "Sources complémentaires"}, "A1": {"label": "1. Couches médaillon bronze / argent / or", "zone": "orange", "zoneName": "Couches & interopérabilité"}, "A2": {"label": "2. Façade FHIR & modèle pivot OMOP CDM", "zone": "orange", "zoneName": "Couches & interopérabilité"}, "C11": {"label": "11. Traitement texte libre : regex + LLM en cascade", "zone": "purple", "zoneName": "Traitement IA & sémantique"}, "C12": {"label": "12. Catalogue de données, graphe de connaissances, ontologie", "zone": "purple", "zoneName": "Traitement IA & sémantique"}, "C17": {"label": "17. Modèles explicables non neuronaux (logique floue)", "zone": "purple", "zoneName": "Traitement IA & sémantique"}, "C21": {"label": "21. Chaîne RAG pour la donnée non structurée", "zone": "purple", "zoneName": "Traitement IA & sémantique"}, "D3": {"label": "3. Gouvernance transverse (identité, sémantique, consentement)", "zone": "green", "zoneName": "Gouvernance & qualité"}, "D6": {"label": "6. Qualité, réconciliation, cycle de vie de la donnée", "zone": "green", "zoneName": "Gouvernance & qualité"}, "D23": {"label": "23. Versionnement systématique (reproductibilité)", "zone": "green", "zoneName": "Gouvernance & qualité"}, "E4": {"label": "4. Boucle de supervision — retour médecin", "zone": "pink", "zoneName": "Supervision & alerting"}, "E5": {"label": "5. Boucle de supervision — détection d'anomalies", "zone": "pink", "zoneName": "Supervision & alerting"}, "E7": {"label": "7. Hiérarchisation et routage de l'alerting", "zone": "pink", "zoneName": "Supervision & alerting"}, "E22": {"label": "22. Boucle de retour vers le système source", "zone": "pink", "zoneName": "Supervision & alerting"}, "G18": {"label": "18. Frise chronologique patient", "zone": "yellow", "zoneName": "Restitution clinique"}, "G20": {"label": "20. Tableaux de bord à trois échelles", "zone": "yellow", "zoneName": "Restitution clinique"}, "B8": {"label": "8. Stack conteneurisée (Docker / Kubernetes)", "zone": "blue", "zoneName": "Infrastructure & orchestration"}, "B9": {"label": "9. Chiffrement & gestion fine des accès", "zone": "blue", "zoneName": "Infrastructure & orchestration"}, "B10": {"label": "10. Orchestration Airflow & transformation DBT", "zone": "blue", "zoneName": "Infrastructure & orchestration"}, "B13": {"label": "13. Tests de bout en bout sur données synthétiques", "zone": "blue", "zoneName": "Infrastructure & orchestration"}, "B14": {"label": "14. Scalabilité et dimensionnement", "zone": "blue", "zoneName": "Infrastructure & orchestration"}, "H25": {"label": "25. Surface d'exposition & tests d'intrusion", "zone": "mauve", "zoneName": "Conformité continue"}, "H26": {"label": "26. Conformité réglementaire (HDS, AI Act, RGPD, AIPD)", "zone": "mauve", "zoneName": "Conformité continue"}, "I24": {"label": "24. Recherche clinique auto-implantée (mesure d'impact)", "zone": "brown", "zoneName": "Impact & valeur"}};
